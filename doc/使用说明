@@ -1,0 +1,22 @@
+使用说明
+1.安装mysql
+2.安装gcc  sudo apt  install  gcc        查看版本 gcc --version
+3.安装redis   启动redis  redis-server /etc/redis/redis.conf
+4.安装java   sudo apt install openjdk-11-jre-headless
+5.安装kafka后启动 zookepper  ./zookeeper-server-start.sh ../config/zookeeper.properties
+5.安装kafka   启动 bin/kafka-server-start.sh config/server.properties
+
+
+
+
+
+
+
+
+
+
+
+
+
+kafka 帮助页面
+https://blog.csdn.net/panchang199266/article/details/82113453
