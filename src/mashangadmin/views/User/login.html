@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link href="/static/layui/css/layui.css" rel="stylesheet" />
+    <link href="/static/layui/lib/layer.css" rel="stylesheet" />
+    <link href="/static/layui/css/admin.css" rel="stylesheet" />
+    <link href="/static/layui/css/modules/laydate/default/laydate.css" rel="stylesheet" />
+    <link href="/static/layui/css/login.css" rel="stylesheet" />
+    <style>
+        .lion-login-left {
+            margin-left: 40px;
+        }
+    </style>
+    <script src="/static/js/jquery-1.10.2.min.js"></script>
+    <script src="/static/layui/layui.js"></script>
+</head>
+<body layadmin-themealias="green-header" class="layui-layout-body" style="">
+<div id="LAY_app" class="layadmin-tabspage-none">
+
+
+    <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+        <div class="layadmin-user-login-main">
+            <div class="layadmin-user-login-box layadmin-user-login-header">
+                <h2>码商管理系统</h2>
+
+            </div>
+            <form  method="post"  action="/user/login" >
+
+
+
+            <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+                <div class="layui-form-item" style="height:57px">
+                    <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+
+                    <input type="text" name="LoginName" id="LoginName" lay-verify="required" placeholder="请输入用户名" class="layui-input">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+
+                    <input type="password" name="LoginPwd" id="LoginPwd" lay-verify="required" placeholder="请输入密码" class="layui-input">
+
+
+                </div>
+
+                <div class="layui-form-item" style="height:57px">
+                    <div class="layui-row">
+                        <div class="layui-col-xs7">
+                            <label class="layadmin-user-login-icon layui-icon layui-icon-vercode" for="LAY-user-login-vercode"></label>
+
+                            <input class="layui-input text-box single-line" id="Vcode" name="Vcode" placeholder="请输入验证码" type="text" value="" />
+
+                        </div>
+                        <div class="layui-col-xs5">
+                            <div style="margin-left: 10px;">
+                                <img src="/Home/GetImg?t=637027912553397955" onclick="changeImg()" alt="点击刷新验证码" title="点击刷新验证码" class="layadmin-user-login-codeimg" id="vcodeimg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid" lay-submit="" lay-filter="LAY-user-login-submit">登 入</button>
+                </div>
+                <div class="layui-trans layui-form-item layadmin-user-login-other">
+
+                    @*<a lay-href="/user/reg" class="layadmin-user-jump-change layadmin-link">注册帐号</a>*@
+                </div>
+
+
+            </div>
+            </form>
+
+        </div>
+
+        <div class="layui-trans layadmin-user-login-footer">
+
+            <p>© 2019 <a href="" target="_blank">www.lion.com</a></p>
+
+        </div>
+
+
+    </div>
+
+</div>
+<input id="hddmsg" type="hidden" value="{{.msg}}" />
+<script type="text/javascript">
+    //JavaScript代码区域
+
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form
+        //var layer = layui.layer;
+        //var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+
+
+        //监听指定开关
+
+        var msg = $("#hddmsg").val();
+
+        //   alert(msg);
+        if (msg!=null &&  msg!="") {
+            layer.open({
+                type: 1
+                , offset: 'auto'
+                , id: 'layerDemo' + 11 //防止重复弹出
+                , content: '<div style="padding: 20px 100px;">' + msg + '</div>'
+                , btn: '关闭全部'
+                , btnAlign: 'c' //按钮居中
+                , shade: 0 //不显示遮罩
+                , yes: function () {
+                    layer.closeAll();
+                }
+            });
+        }
+    });
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
