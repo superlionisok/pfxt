@@ -1,4 +1,4 @@
-使用说明
+安装说明
 1.安装mysql
 2.安装gcc  sudo apt  install  gcc        查看版本 gcc --version
 3.安装redis   启动redis  redis-server /etc/redis/redis.conf

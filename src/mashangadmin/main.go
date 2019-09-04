@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	"mashangadmin/controllers"
 	_ "mashangadmin/routers"
 )
 
@@ -13,7 +14,7 @@ func main() {
 
 	logs.Async()
 	//logs.SetLogger(logs.AdapterFile,`{"filename":"test.log","level":7,"maxlines":0,"maxsize":0,"daily":true,"maxdays":10}`)
-	logs.SetLevel(logs.LevelDebug)
+	logs.SetLevel(logs.LevelNotice)
 	//logs.SetLogFuncCall(true)
 	logs.EnableFuncCallDepth(true)
 	logs.SetLogger(logs.AdapterMultiFile, `{"filename":"logs/test.log","separate":["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]}`)
@@ -44,6 +45,7 @@ func main() {
 	//log.Close()
 	//
 
+	beego.ErrorController(&controllers.ErrorController{})
 	beego.Run()
 
 }

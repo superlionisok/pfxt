@@ -1,0 +1,331 @@
+<div class="layui-body" id="LAY_app_body">
+    <div class="layadmin-tabsbody-item layui-show">
+
+        <div class="layui-fluid">
+            <div class="layui-card">
+
+                <div class="layui-card-body" style="padding: 15px;">
+                    <form class="layui-form" action="" lay-filter="component-form-group" method="post">
+
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">通道类型</label>
+                            <div class="layui-input-block">
+
+
+                                <select class="layui-input" id="channelType" name="channelType" lay-verify="required"
+                                        lay-search="" lay-filter="channelTypeID">
+
+                                    <option value="0"> 选择通道</option>
+                                    {{range .payChannels}}
+
+                                        <option value="{{.Id}}"> {{.Title}} </option>
+
+                                    {{end}}
+
+
+                                </select>
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">收款账户</label>
+                            <div class="layui-input-block">
+
+
+                                <select class="layui-input" id="QrType" name="QrType" lay-verify="required"
+                                        lay-search="" lay-filter="QrTypeID">
+
+
+                                    <option value="0"> 选择收款账户</option>
+
+
+                                </select>
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">账户详情</label>
+                            <div class="layui-input-block">
+
+                                <input class="layui-input text-box single-line" readonly id="qrCodeDetail"
+                                       name="qrCodeDetail"
+                                       placeholder="账户详情" type="text" value="">
+
+
+                            </div>
+
+                            <span class="field-validation-valid layui-form-mid layui-word-aux" data-valmsg-for="Title"
+                                  data-valmsg-replace="true"></span>
+
+
+                        </div>
+
+
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+
+
+                                <div class="layui" style="text-align: center;">
+                                    <button id="dograb" type="button" class="layui-btn" onclick="doGrab()">立即抢单</button>
+                                    <button id="cancelgrab" type="button"
+                                            class="layui-btn layui-btn-danger layui-btn-disabled"
+                                            onclick="cancelGrab()">取消抢单
+                                    </button>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<input type="hidden" id="iptmin" value="0">
+<input type="hidden" id="iptmax" value="0">
+<script type="application/javascript">
+
+    layui.use('form', function () {
+        var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+        form.render();
+        form.on('select(channelTypeID)', function (data) {
+
+
+            dobindQrcode();
+        });
+        form.on('select(QrTypeID)', function (data) {
+
+
+            dobindQrcodeDetail();
+        });
+
+    });
+
+    function dobindQrcode() {
+
+        var id = $("#channelType").val();
+        if (id == 0) {
+            $("#QrType").empty();
+            // $("#QrType").append("<option value='0'>" + "选择收款账户" + "</option>");
+            $("#qrCodeDetail").val()
+            var form = layui.form;
+            form.render();
+            return
+        }
+
+
+        $.ajax(
+            {
+                url: "/grab/GetQrCodeByCodeType",
+                type: "GET",
+                dataType: "json",
+                data: {id: id},
+                success: function (result) {
+
+                    $("#QrType").empty();
+                    //  $("#QrType").append("<option value='0'>" + "选择收款账户" + "</option>");
+                    $("#qrCodeDetail").val()
+                    console.log("现在清理了QrType");
+
+                    console.log("result.Status=" + result.Status);
+                    console.log("result.Count=" + result.Count);
+
+                    if (result.Status == 1 && result.Count > 0) {
+                        $.each(result.Data, function (key, val) {
+                            console.log("添加+ id=" + val.ID + "title=" + val.Title);
+                            $("#QrType").append("<option value='" + val.ID + "'>" + val.Title + "</option>");
+
+
+                        });
+                        $("#qrCodeDetail").val("最小金额：" + result.Data[0].MinMoney + "元，最大金额：" + result.Data[0].MaxMoney + "元")
+
+                        $("#iptmax").val(result.Data[0].MaxMoney)
+                        $("#iptmin").val(result.Data[0].MinMoney)
+                        var form = layui.form;
+                        form.render();
+                        console.log(" QrType=" + $("#QrType").val());
+                    } else {
+                        console.log("查询数据失败");
+                    }
+
+
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+
+
+    }
+
+    function dobindQrcodeDetail() {
+
+        var id = $("#QrType").val();
+
+        $.ajax(
+            {
+                url: "/grab/GetQrCodeDetailById",
+                type: "GET",
+                dataType: "json",
+                data: {id: id},
+                success: function (result) {
+
+                    $("#qrCodeDetail").val()
+                    if (result.Status == 1 && result.Count > 0) {
+
+                        $("#qrCodeDetail").val("最小金额：" + result.Data.MinMoney + "元，最大金额：" + result.Data.MaxMoney + "元")
+                        $("#iptmax").val(result.Data.MaxMoney)
+                        $("#iptmin").val(result.Data.MinMoney)
+                        var form = layui.form;
+                        form.render();
+
+                    } else {
+                        console.log("查询数据失败");
+                    }
+
+
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+
+
+    }
+
+    function doGrab() {
+        console.log("do grab")
+        $("#dograb").addClass("layui-btn-disabled").text("抢单中……")
+        $("#cancelgrab").removeClass("layui-btn-disabled")
+
+        var id = $("#QrType").val();
+
+
+        var idChannel = $("#channelType").val();
+        var maxMoney = $("#iptmax").val()
+
+        var minMoney = $("#iptmin").val()
+
+        var form = layui.form;
+        form.render();
+        $.ajax(
+            {
+                url: "/grab/AddTempOrder",
+                type: "GET",
+                dataType: "json",
+                data: {id: id, idChannel: idChannel, maxMoney: maxMoney, minMoney: minMoney},
+                success: function (result) {
+
+                    $("#qrCodeDetail").val()
+                    if (result.Status == 1 && result.Count == 0) {
+
+                        // alert("add ok")
+                        $("#dograb").addClass("layui-btn-disabled").text("抢单中……")
+                        $("#cancelgrab").removeClass("layui-btn-disabled")
+
+                    } else if (result.Status == 1 && result.Count == 1) {
+                        layer.open({
+                            type: 1
+                            , offset: 'auto'
+                            , id: 'layerDemo' + 11 //防止重复弹出
+                            , content: '<div style="padding: 20px 100px;">' + "已有抢单任务" + '</div>'
+                            , btn: '关闭全部'
+                            , btnAlign: 'c' //按钮居中
+                            , shade: 0 //不显示遮罩
+                            , yes: function () {
+                                layer.closeAll();
+                            }
+                        });
+                    } else {
+                        console.log("查询数据失败");
+                    }
+
+
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+
+
+    }
+
+    function cancelGrab() {
+        console.log("do grab")
+
+
+
+        $.ajax(
+            {
+                url: "/grab/DelTempOrder",
+                type: "GET",
+                dataType: "json",
+                data: {},
+                success: function (result) {
+
+
+                    if (result.Status == 1 ) {
+
+                        $("#dograb").removeClass("layui-btn-disabled").text("立即抢单")
+                        $("#cancelgrab").addClass("layui-btn-disabled")
+
+                        var form = layui.form;
+                        form.render();
+
+
+                    } else {
+                        layer.open({
+                            type: 1
+                            , offset: 'auto'
+                            , id: 'layerDemo' + 11 //防止重复弹出
+                            , content: '<div style="padding: 20px 100px;">' + result.Msg+ '</div>'
+                            , btn: '关闭全部'
+                            , btnAlign: 'c' //按钮居中
+                            , shade: 0 //不显示遮罩
+                            , yes: function () {
+                                layer.closeAll();
+                            }
+                        });
+                        console.log("查询数据失败");
+                    }
+
+
+                },
+                error: function (xhr, status, p3, p4) {
+                    var err = "Error " + " " + status + " " + p3;
+                    if (xhr.responseText && xhr.responseText[0] == "{")
+                        err = JSON.parse(xhr.responseText).message;
+                    alert(err);
+                }
+            });
+
+
+
+
+
+
+    }
+
+</script>

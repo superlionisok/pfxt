@@ -1,0 +1,206 @@
+<style>
+    .laytable-cell-1-0-0 {
+        width: 80px;
+    }
+
+    .laytable-cell-1-0-1 {
+        width: 80px;
+    }
+
+    .laytable-cell-1-0-2 {
+        width: 80px;
+    }
+
+    .laytable-cell-1-0-3 {
+        width: 80px;
+    }
+
+    .laytable-cell-1-0-4 {
+    }
+
+    .laytable-cell-1-0-5 {
+        width: 80px;
+    }
+
+    .laytable-cell-1-0-6 {
+        width: 80px;
+    }
+
+    .laytable-cell-1-0-7 {
+        width: 80px;
+    }
+
+    .laytable-cell-1-0-8 {
+        width: 135px;
+    }
+</style>
+
+<div class="layui-body" id="LAY_app_body">
+    <div class="layadmin-tabsbody-item layui-show">
+
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+
+                        <div class="layui-card-body">
+                            <form class="layui-form" method="get">
+                                <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+                                    搜索关键字：
+                                    <div class="layui-inline">
+
+
+                                        @Html.DropDownList("LotteryTypeID", null, new { @class = "layui-input" })
+
+                                    </div>
+                                    <div class="layui-inline">
+                                        <input id="txtkeywords" type="text" name="txtkeywords" placeholder="关键字" autocomplete="off" class="layui-input" value="">
+
+                                    </div>
+                                    <button class="layui-btn" data-type="reload" onclick="DoSearch(1)">搜索</button>
+                                    <a href="/Lottery/create" class="layui-btn" style="float:right;" data-type="reload">添加</a>
+
+
+                                </div>
+                            </form>
+                            <!--<table class="layui-hide" id="test-table-reload" lay-filter="user"></table>-->
+                            <div style="clear:both"></div>
+                            <table id="maintable" class="layui-table">
+                                <colgroup>
+                                    <col width="150">
+                                    <col width="150">
+                                    <col width="150">
+                                    <col width="150">
+                                    <col>
+                                    <col width="200">
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th>彩票名称</th>
+                                    <th>缩写代码</th>
+                                    <th>彩种类型</th>
+                                    <th>每天期数</th>
+                                    <th>是否启用</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                            <div id="mainpage"></div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input id="hddpagelimit" type="hidden" value="@ViewBag.limit" />
+<script>
+
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+        form.render();
+        //下拉框
+        form.on('select(selectLotteryID)', function (data) {
+
+            //  alert(data.value);
+
+            DoSearch(1);
+        });
+        form.on('submit()', function (data) {
+
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+    });
+   // DoSearch(1);
+    function RenderPage(c, curr) {
+        layui.use('laypage', function () {
+            var laypage = layui.laypage;
+            var limitneed = $("#hddpagelimit").val();
+            laypage.render({
+                elem: 'mainpage'
+                , count: c //数据总数，从服务端得到
+                , curr: curr
+                , limit: limitneed
+                , jump: function (obj, first) {
+                    //obj包含了当前分页的所有参数，比如：
+                    console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+                    console.log(obj.limit); //得到每页显示的条数
+                    //首次不执行
+                    if (!first) {
+                        //do something
+                        DoSearch(obj.curr);
+                    }
+                }
+            });
+        });
+    }
+    function DoOne(id) {
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            layer.confirm('确定要修改吗？', {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                $.post("/MyLottery/do/" + id, function (data) {
+                    if (data == "ok") {
+                        //删除成功 刷新页面
+                        layer.msg('修改成功');
+                        DoSearch(1);
+                    }
+                    else {
+                        layer.msg('修改失败');
+                    }
+                });
+            }, function () {
+                // 点取消 不做任何操作
+            });
+        });
+    }
+    function DoSearch(pageindex) {
+        var keywords = $("#txtkeywords").val();
+        var lotteryTypeID = $("#LotteryTypeID").val();
+        $.ajax({
+            type: "GET",
+            url: "/MyLottery/GetPageList",
+            data: { pageindex: pageindex, keyWords: keywords ,lotteryTypeID:lotteryTypeID},
+            dataType: "json",
+            success: function (data) {
+                if (data.Status == "1") {
+
+
+
+                    //获取数据成功
+                    $("#maintable tbody").html("");
+                    $.each(data.Data, function (key, value) {  //遍历键值对
+
+                        var islock = "停用";
+                        if (value.IsLock==1) {
+                            var islock = "启用中";
+                        }
+
+                        var strHtml = "  <tr>    <td>" + value.Title + " </td> <td>" + value.AbName + "</td>    <td>" + value.LotteryTypeTitle + "</td>  <td>" + value.DayOpenCount + "</td>  <td>" + islock + "</td>    <td>   <button class=\"layui-btn layui-btn-sm layui-btn-danger\" onclick=\"DoOne(" + value.ID + ")\" >修改启用状态</button>   </td>       </tr>";
+                        $("#maintable tbody").append(strHtml);
+                    })
+                    RenderPage(data.Count, pageindex);
+                    if (data.Count==0) {
+                        layer.msg('该条件下无数据！');
+                    }
+
+
+                } else {
+                    layer.msg('获取列表失败，失败原因:' + data.Msg);
+                }
+            },
+            error: function (jqXHR) {
+                //aler("发生错误：" + jqXHR.status);
+                layer.msg("发生错误：" + jqXHR.status);
+            }
+        });
+
+        return false;
+    }
+</script>

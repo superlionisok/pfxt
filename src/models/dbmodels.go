@@ -24,6 +24,7 @@ type SysPayChannel struct {
 //码商二维码
 type MsQrCode struct {
 	ID              int
+	MsUserID        int
 	SysPayChannelID int
 	QrImageUrl      string
 	MinMoney        float32
@@ -56,8 +57,8 @@ type MsTempOrder struct {
 	MsUserID        int
 	MsQrCodeID      int
 	SysPayChannelID int
-	MinMoney        float32
-	MaxMoney        float32
+	MinMoney        float64
+	MaxMoney        float64
 	CreateTime      time.Time
 }
 
