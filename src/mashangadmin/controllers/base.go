@@ -24,7 +24,7 @@ func (c *BaseController) DoInit() {
 		c.Ctx.Redirect(302, "/user/login")
 		return
 	}
-	ustr, err := helper.RedisGet(cooValue)
+	ustr, err := helper.RedisGetAndResetTime(cooValue)
 	if err != nil {
 		//	panic("get redis value err"+err.Error())
 

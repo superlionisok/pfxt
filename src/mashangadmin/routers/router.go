@@ -16,5 +16,8 @@ func init() {
 	beego.Router("/grab/AddTempOrder", &controllers.GrabController{}, "get:AddTempOrder")
 	beego.Router("/grab/DelTempOrder", &controllers.GrabController{}, "get:DelTempOrder")
 	beego.Router("/qrcode/index", &controllers.QrCodeController{}, "get:IndexGet")
+	beego.Router("/qrcode/index", &controllers.QrCodeController{}, "get:IndexGet")
+	beego.Router("/qrcode/create", &controllers.QrCodeController{}, "get:CreateGet;post:CreatePost")
+	beego.Router("/files/upfile", &controllers.FilesController{}, "post:UpFile")
 
 }

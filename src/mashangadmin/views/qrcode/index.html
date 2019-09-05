@@ -50,7 +50,21 @@
                                     <div class="layui-inline">
 
 
-                                        @Html.DropDownList("LotteryTypeID", null, new { @class = "layui-input" })
+
+                                        <select class="layui-input" id="channelType" name="channelType" lay-verify="required"
+                                                lay-search="" lay-filter="channelTypeID">
+
+                                            <option value="0"> 选择通道</option>
+                                            {{range .payChannels}}
+
+                                                <option value="{{.Id}}"> {{.Title}} </option>
+
+                                            {{end}}
+
+
+                                        </select>
+
+
 
                                     </div>
                                     <div class="layui-inline">
@@ -76,11 +90,11 @@
                                 </colgroup>
                                 <thead>
                                 <tr>
-                                    <th>彩票名称</th>
-                                    <th>缩写代码</th>
-                                    <th>彩种类型</th>
-                                    <th>每天期数</th>
-                                    <th>是否启用</th>
+                                    <th>标题</th>
+                                    <th>通道名称</th>
+                                    <th>最小金额</th>
+                                    <th>最大金额</th>
+                                    <th>每天收款量</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
@@ -162,7 +176,7 @@
     }
     function DoSearch(pageindex) {
         var keywords = $("#txtkeywords").val();
-        var lotteryTypeID = $("#LotteryTypeID").val();
+        var channelType = $("#channelType").val();
         $.ajax({
             type: "GET",
             url: "/MyLottery/GetPageList",
